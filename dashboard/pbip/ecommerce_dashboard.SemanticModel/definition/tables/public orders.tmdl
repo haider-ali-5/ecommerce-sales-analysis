@@ -1,0 +1,122 @@
+table 'public orders'
+	lineageTag: ab745770-ab43-4de3-adce-d6db4672985c
+
+	measure 'Total Orders' = CALCULATE(DISTINCTCOUNT('public orders'[order_id]), 'public orders'[order_status] = "delivered")
+		formatString: 0
+		lineageTag: 9fa96fa7-55b9-4100-a003-239aa318c2e9
+
+	measure 'Total Revenue' = CALCULATE(SUM('public order_payments'[payment_value]), 'public orders'[order_status] = "delivered")
+		lineageTag: 1f9281d7-ce2b-4e46-8c3b-00d0882eec81
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Payment Row Count' = COUNTROWS('public order_payments')
+		formatString: 0
+		lineageTag: 0e4984c0-2a11-477a-989b-f5a02447bd37
+
+	measure ': Avg Order Value' = DIVIDE([Total Revenue], [Total Orders])
+		lineageTag: 4e441a42-9fa1-452f-a0b1-8e494f96a456
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Late Delivery Rate %' = VAR LateCount = CALCULATE( COUNTROWS('public orders'), FILTER( 'public orders', VAR d1 = IFERROR(DATEVALUE('public orders'[order_delivered_customer_date]), BLANK()) VAR d2 = IFERROR(DATEVALUE('public orders'[order_estimated_delivery_date]), BLANK()) RETURN NOT ISBLANK(d1) && NOT ISBLANK(d2) && d1 > d2 ) ) RETURN DIVIDE(LateCount, [Total Orders]) * 100
+		formatString: 0.00"%"
+		lineageTag: 36eb24c5-7f48-41ea-8a77-2fa2b7c752ef
+
+	measure Measure
+		lineageTag: b75e5f43-3853-4941-98fa-142cfd5085c7
+
+		annotation 43dbc3e8-3a1c-4b6f-9923-b49ff7d6691c = True
+
+	measure 'Avg Delay Days' = AVERAGEX(FILTER('public orders', LEN('public orders'[order_delivered_customer_date]) > 5 && LEN('public orders'[order_estimated_delivery_date]) > 5), IFERROR(DATEDIFF(DATEVALUE('public orders'[order_estimated_delivery_date]), DATEVALUE('public orders'[order_delivered_customer_date]), DAY), BLANK()))
+		lineageTag: 8a2e6d50-b899-4483-a179-988171c361e7
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column order_id
+		dataType: string
+		lineageTag: 5f6419ec-0232-4133-a1f0-03b89660fa89
+		summarizeBy: none
+		sourceColumn: order_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column customer_id
+		dataType: string
+		lineageTag: d16518c9-5424-40a9-93bb-320d08e2605d
+		summarizeBy: none
+		sourceColumn: customer_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column order_status
+		dataType: string
+		lineageTag: f7439544-f79b-4637-8206-02c883e37032
+		summarizeBy: none
+		sourceColumn: order_status
+
+		annotation SummarizationSetBy = Automatic
+
+	column order_purchase_timestamp
+		dataType: string
+		lineageTag: 4d2e0414-bbc8-4802-af82-41414381e3ba
+		summarizeBy: none
+		sourceColumn: order_purchase_timestamp
+
+		annotation SummarizationSetBy = Automatic
+
+	column order_approved_at
+		dataType: string
+		lineageTag: b2e12668-fbb6-4831-b931-b94ff9b2a369
+		summarizeBy: none
+		sourceColumn: order_approved_at
+
+		annotation SummarizationSetBy = Automatic
+
+	column order_delivered_carrier_date
+		dataType: string
+		lineageTag: fb24c17f-680b-4c68-9d62-44ca82deeded
+		summarizeBy: none
+		sourceColumn: order_delivered_carrier_date
+
+		annotation SummarizationSetBy = Automatic
+
+	column order_delivered_customer_date
+		dataType: string
+		lineageTag: cdfad8fc-72d2-4132-8ee7-681f2c58f467
+		summarizeBy: none
+		sourceColumn: order_delivered_customer_date
+
+		annotation SummarizationSetBy = Automatic
+
+	column order_estimated_delivery_date
+		dataType: string
+		lineageTag: c6838a79-5639-44d7-956d-8eddaf18f245
+		summarizeBy: none
+		sourceColumn: order_estimated_delivery_date
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Order Month' = FORMAT(DATEVALUE(LEFT('public orders'[order_purchase_timestamp], 10)), "YYYY-MM")
+		lineageTag: f2ddd0c4-9799-47f5-a9e9-1991be5440fb
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Order Year' = LEFT('public orders'[Order Month], 4)
+		lineageTag: b2f87b5d-e831-4ec4-a66e-f64457af33cf
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'public orders' = m
+		mode: import
+		source =
+				let
+				    Source = PostgreSQL.Database("localhost:5432", "ecommerce_db"),
+				    public_orders = Source{[Schema="public",Item="orders"]}[Data]
+				in
+				    public_orders
+
+	annotation PBI_ResultType = Table
+

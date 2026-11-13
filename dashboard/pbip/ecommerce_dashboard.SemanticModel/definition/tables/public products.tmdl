@@ -1,0 +1,93 @@
+table 'public products'
+	lineageTag: 7cae8b3a-fd5e-4732-9541-bb2c17c21917
+
+	column product_id
+		dataType: string
+		lineageTag: b7840920-1a54-47cc-8763-f3db2388b0eb
+		summarizeBy: none
+		sourceColumn: product_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column product_category_name
+		dataType: string
+		lineageTag: 5c50010a-0b10-46f1-8fe3-4f8826ab4138
+		summarizeBy: none
+		sourceColumn: product_category_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column product_name_lenght
+		dataType: int64
+		formatString: 0
+		lineageTag: 7845c0fb-4718-434b-b8fb-70b9bedf5a76
+		summarizeBy: sum
+		sourceColumn: product_name_lenght
+
+		annotation SummarizationSetBy = Automatic
+
+	column product_description_lenght
+		dataType: int64
+		formatString: 0
+		lineageTag: e203d3bd-5d5b-4d18-9a44-b4b33cfcebdb
+		summarizeBy: sum
+		sourceColumn: product_description_lenght
+
+		annotation SummarizationSetBy = Automatic
+
+	column product_photos_qty
+		dataType: int64
+		formatString: 0
+		lineageTag: 0e50bd18-5a35-40fe-aa11-7e5505bf180c
+		summarizeBy: sum
+		sourceColumn: product_photos_qty
+
+		annotation SummarizationSetBy = Automatic
+
+	column product_weight_g
+		dataType: int64
+		formatString: 0
+		lineageTag: 9f66beb1-b643-4afb-8016-f8a8a6e3931d
+		summarizeBy: sum
+		sourceColumn: product_weight_g
+
+		annotation SummarizationSetBy = Automatic
+
+	column product_length_cm
+		dataType: int64
+		formatString: 0
+		lineageTag: 95b7db9e-c14f-40df-8562-40bce329b935
+		summarizeBy: sum
+		sourceColumn: product_length_cm
+
+		annotation SummarizationSetBy = Automatic
+
+	column product_height_cm
+		dataType: int64
+		formatString: 0
+		lineageTag: 3a045685-6b0f-4379-9dc4-717082ae2d7e
+		summarizeBy: sum
+		sourceColumn: product_height_cm
+
+		annotation SummarizationSetBy = Automatic
+
+	column product_width_cm
+		dataType: int64
+		formatString: 0
+		lineageTag: 0e724459-91c7-470c-8cf1-68fc54969747
+		summarizeBy: sum
+		sourceColumn: product_width_cm
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'public products' = m
+		mode: import
+		source =
+				let
+				    Source = PostgreSQL.Database("localhost:5432", "ecommerce_db"),
+				    public_products = Source{[Schema="public",Item="products"]}[Data]
+				in
+				    public_products
+
+	annotation PBI_ResultType = Table
+

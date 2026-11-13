@@ -1,0 +1,75 @@
+table 'public order_items'
+	lineageTag: ba1b77a4-a7fd-493c-a164-ef111da608b1
+
+	column order_id
+		dataType: string
+		lineageTag: cfa8d7d9-7ff4-46cb-87d1-158ed4d91bdf
+		summarizeBy: none
+		sourceColumn: order_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column order_item_id
+		dataType: int64
+		formatString: 0
+		lineageTag: d2385266-4700-4577-8482-b73d3c0b68a8
+		summarizeBy: sum
+		sourceColumn: order_item_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column product_id
+		dataType: string
+		lineageTag: 7ef4abc9-470c-44e6-a51e-557bd5d66a7b
+		summarizeBy: none
+		sourceColumn: product_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column seller_id
+		dataType: string
+		lineageTag: 643e3cd7-2480-4903-af6d-1ae3728a643c
+		summarizeBy: none
+		sourceColumn: seller_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column shipping_limit_date
+		dataType: string
+		lineageTag: f8e941a2-6fbe-4e8b-a33b-2dc20f2e07f6
+		summarizeBy: none
+		sourceColumn: shipping_limit_date
+
+		annotation SummarizationSetBy = Automatic
+
+	column price
+		dataType: double
+		lineageTag: b0ed870a-4a2c-4190-bd75-832e38a0bb93
+		summarizeBy: sum
+		sourceColumn: price
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column freight_value
+		dataType: double
+		lineageTag: 7a9a6be6-fd25-4e81-b807-8e6b48b5c796
+		summarizeBy: sum
+		sourceColumn: freight_value
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition 'public order_items' = m
+		mode: import
+		source =
+				let
+				    Source = PostgreSQL.Database("localhost:5432", "ecommerce_db"),
+				    public_order_items = Source{[Schema="public",Item="order_items"]}[Data]
+				in
+				    public_order_items
+
+	annotation PBI_ResultType = Table
+

@@ -1,0 +1,59 @@
+table 'public geolocation'
+	lineageTag: a2c0f171-a727-4802-8d53-4f60abb6c59e
+
+	column geolocation_zip_code_prefix
+		dataType: int64
+		formatString: 0
+		lineageTag: 5219c73e-e6da-4b08-b732-028af305cb0f
+		summarizeBy: sum
+		sourceColumn: geolocation_zip_code_prefix
+
+		annotation SummarizationSetBy = Automatic
+
+	column geolocation_lat
+		dataType: double
+		lineageTag: b76facbc-7fb5-4862-b8e5-7743b9428097
+		summarizeBy: sum
+		sourceColumn: geolocation_lat
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column geolocation_lng
+		dataType: double
+		lineageTag: ad56a93e-bbf6-40c9-9954-43f7a3256723
+		summarizeBy: sum
+		sourceColumn: geolocation_lng
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column geolocation_city
+		dataType: string
+		lineageTag: c48c578f-3f5a-4aa9-9b68-ec1cf4b12af6
+		summarizeBy: none
+		sourceColumn: geolocation_city
+
+		annotation SummarizationSetBy = Automatic
+
+	column geolocation_state
+		dataType: string
+		lineageTag: a77d7a9a-9ce7-464f-873b-c1a08979ae72
+		summarizeBy: none
+		sourceColumn: geolocation_state
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'public geolocation' = m
+		mode: import
+		source =
+				let
+				    Source = PostgreSQL.Database("localhost:5432", "ecommerce_db"),
+				    public_geolocation = Source{[Schema="public",Item="geolocation"]}[Data]
+				in
+				    public_geolocation
+
+	annotation PBI_ResultType = Table
+

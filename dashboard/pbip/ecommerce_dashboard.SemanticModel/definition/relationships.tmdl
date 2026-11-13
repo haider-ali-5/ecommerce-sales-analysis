@@ -1,0 +1,42 @@
+relationship AutoDetected_bcba70a0-f865-4a3e-9d5f-f2811a9fe1aa
+	crossFilteringBehavior: bothDirections
+	fromCardinality: one
+	fromColumn: 'public orders'.customer_id
+	toColumn: 'public customers'.customer_id
+
+relationship AutoDetected_fb94a4ff-293c-44a5-aae3-67d3de2bb615
+	fromColumn: 'public order_items'.order_id
+	toColumn: 'public orders'.order_id
+
+relationship AutoDetected_9526d949-85b8-4a7c-917a-db3578e921f6
+	fromColumn: 'public order_reviews'.order_id
+	toColumn: 'public orders'.order_id
+
+relationship AutoDetected_aa866d4e-f203-4671-8b5e-7cb6cc8362bc
+	crossFilteringBehavior: bothDirections
+	fromColumn: 'public order_payments'.order_id
+	toColumn: 'public orders'.order_id
+
+relationship AutoDetected_c1d09176-6fcf-440a-8f66-74a8eac28a98
+	fromColumn: 'public order_items'.product_id
+	toColumn: 'public products'.product_id
+
+relationship AutoDetected_6b206e07-6bfa-45f9-a20d-5c3eeec6abef
+	fromColumn: 'public order_items'.seller_id
+	toColumn: 'public sellers'.seller_id
+
+relationship 3c486146-80dc-fd09-4f83-35367abe6b0c
+	fromColumn: 'public products'.product_category_name
+	toColumn: 'public product_category_name_translation'.product_category_name
+
+relationship AutoDetected_2118c8cd-4a1c-44d2-9696-0cfb0a666b60
+	crossFilteringBehavior: bothDirections
+	fromColumn: 'public customers'.customer_unique_id
+	toColumn: rfm_segments.customer_unique_id
+
+relationship 79e2065b-ebbd-bf77-2266-3fe99d002702
+	crossFilteringBehavior: bothDirections
+	toCardinality: many
+	fromColumn: 'public customers'.customer_zip_code_prefix
+	toColumn: 'Geo Summary'.geolocation_zip_code_prefix
+

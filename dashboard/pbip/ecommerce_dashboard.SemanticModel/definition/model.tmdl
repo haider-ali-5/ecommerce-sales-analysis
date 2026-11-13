@@ -1,0 +1,29 @@
+model Model
+	culture: en-US
+	defaultPowerBIDataSourceVersion: powerBI_V3
+	sourceQueryCulture: en-US
+	valueFilterBehavior: independent
+	dataAccessOptions
+		legacyRedirects
+		returnErrorValuesAsNull
+
+annotation __PBI_TimeIntelligenceEnabled = 1
+
+annotation PBI_QueryOrder = ["public customers","public geolocation","public order_items","public order_reviews","public order_payments","public orders","public products","public product_category_name_translation","public sellers","rfm_segments"]
+
+annotation PBI_ProTooling = ["DevMode"]
+
+ref table 'public customers'
+ref table 'public geolocation'
+ref table 'public order_items'
+ref table 'public order_reviews'
+ref table 'public order_payments'
+ref table 'public orders'
+ref table 'public products'
+ref table 'public product_category_name_translation'
+ref table 'public sellers'
+ref table rfm_segments
+ref table 'Geo Summary'
+
+ref cultureInfo en-US
+

@@ -1,0 +1,58 @@
+table 'public order_payments'
+	lineageTag: f79fd37a-b2d6-4c73-a7b6-8d960ef1b23b
+
+	column order_id
+		dataType: string
+		lineageTag: 7a179559-d5a4-40af-88c4-6524878612ac
+		summarizeBy: none
+		sourceColumn: order_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column payment_sequential
+		dataType: int64
+		formatString: 0
+		lineageTag: 7bbbcc2a-d340-43cf-928f-0a2ae4ba5aa5
+		summarizeBy: sum
+		sourceColumn: payment_sequential
+
+		annotation SummarizationSetBy = Automatic
+
+	column payment_type
+		dataType: string
+		lineageTag: 42754f47-aca4-464f-b2a6-8371213c949f
+		summarizeBy: none
+		sourceColumn: payment_type
+
+		annotation SummarizationSetBy = Automatic
+
+	column payment_installments
+		dataType: int64
+		formatString: 0
+		lineageTag: 561c47a4-4a96-4959-b5dd-5803ba51ad7e
+		summarizeBy: sum
+		sourceColumn: payment_installments
+
+		annotation SummarizationSetBy = Automatic
+
+	column payment_value
+		dataType: double
+		lineageTag: ef8318bc-4d7e-4a81-a781-d42b32f13f71
+		summarizeBy: sum
+		sourceColumn: payment_value
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition 'public order_payments' = m
+		mode: import
+		source =
+				let
+				    Source = PostgreSQL.Database("localhost:5432", "ecommerce_db"),
+				    public_order_payments = Source{[Schema="public",Item="order_payments"]}[Data]
+				in
+				    public_order_payments
+
+	annotation PBI_ResultType = Table
+

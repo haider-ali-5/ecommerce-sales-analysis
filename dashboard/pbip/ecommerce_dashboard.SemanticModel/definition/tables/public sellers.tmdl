@@ -1,0 +1,47 @@
+table 'public sellers'
+	lineageTag: b5548b24-c1d5-4ea3-88db-34c6a2a7366b
+
+	column seller_id
+		dataType: string
+		lineageTag: a8a63a9f-6c8a-4da4-97e8-7aee09c3d450
+		summarizeBy: none
+		sourceColumn: seller_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column seller_zip_code_prefix
+		dataType: int64
+		formatString: 0
+		lineageTag: 728fe9bb-3451-4019-9fb0-1f2bfb21bebe
+		summarizeBy: none
+		sourceColumn: seller_zip_code_prefix
+
+		annotation SummarizationSetBy = Automatic
+
+	column seller_city
+		dataType: string
+		lineageTag: ccfd3e30-67ee-40e4-b453-a67e689ecf6b
+		summarizeBy: none
+		sourceColumn: seller_city
+
+		annotation SummarizationSetBy = Automatic
+
+	column seller_state
+		dataType: string
+		lineageTag: ff6c518a-d58e-4680-bcff-8e3e216d9bdf
+		summarizeBy: none
+		sourceColumn: seller_state
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'public sellers' = m
+		mode: import
+		source =
+				let
+				    Source = PostgreSQL.Database("localhost:5432", "ecommerce_db"),
+				    public_sellers = Source{[Schema="public",Item="sellers"]}[Data]
+				in
+				    public_sellers
+
+	annotation PBI_ResultType = Table
+

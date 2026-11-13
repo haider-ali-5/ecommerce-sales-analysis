@@ -1,0 +1,50 @@
+table 'Geo Summary'
+	lineageTag: a89f40c7-5f70-428b-9fcf-76c8224a0c34
+
+	measure 'Repeat Buyer %' = VAR t = ADDCOLUMNS(VALUES('public customers'[customer_unique_id]), "n", CALCULATE(DISTINCTCOUNT('public orders'[order_id]), 'public orders'[order_status] = "delivered")) VAR total = COUNTROWS(FILTER(t, [n] > 0)) VAR repeat = COUNTROWS(FILTER(t, [n] > 1)) RETURN DIVIDE(repeat, total)
+		formatString: 0.0
+		lineageTag: f176be8e-acc3-4cc5-9441-6ba6890baa76
+
+	column geolocation_zip_code_prefix
+		formatString: 0
+		lineageTag: 80dacbf6-c8d9-4995-ae5f-a9424280bfd1
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: public geolocation[geolocation_zip_code_prefix]
+
+		annotation SummarizationSetBy = Automatic
+
+	column geolocation_state
+		lineageTag: 62f6ffb6-ea30-427b-be98-e43c336b0f48
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: public geolocation[geolocation_state]
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Avg Lat'
+		lineageTag: 46019866-0454-4999-ab5c-ff98c1c092f1
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [Avg Lat]
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Avg Lng'
+		lineageTag: 0e5e2da0-82ac-4169-babb-43b49d725f56
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [Avg Lng]
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition 'Geo Summary' = calculated
+		mode: import
+		source = SUMMARIZE('public geolocation', 'public geolocation'[geolocation_zip_code_prefix], 'public geolocation'[geolocation_state], "Avg Lat", AVERAGE('public geolocation'[geolocation_lat]), "Avg Lng", AVERAGE('public geolocation'[geolocation_lng]))
+
+	annotation PBI_Id = 361afbeeb83c49a8b8d253948872387e
+

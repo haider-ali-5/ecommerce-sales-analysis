@@ -1,0 +1,95 @@
+table rfm_segments
+	lineageTag: 172ad8a6-b871-4c7b-8f1d-1fb15d246935
+
+	measure 'One-Time Buyers' = CALCULATE(COUNTROWS('rfm_segments'), 'rfm_segments'[frequency] = 1)
+		formatString: 0
+		lineageTag: dc6bceed-2deb-4da9-b759-4ee6746e418e
+
+	measure 'Repeat Buyers' = CALCULATE(COUNTROWS('rfm_segments'), 'rfm_segments'[frequency] > 1)
+		formatString: 0
+		lineageTag: f0a41b12-da51-4165-ac12-1dc03d8078b5
+
+	measure 'Revenue at Risk' = CALCULATE(SUM('rfm_segments'[monetary]), 'rfm_segments'[segment] IN {"At-Risk", "Lost"})
+		lineageTag: 854375df-1045-43fc-95c2-d67f1ed1d164
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column customer_unique_id
+		dataType: string
+		lineageTag: 1a0d3fc2-5513-466c-831b-8441f98e2746
+		summarizeBy: none
+		sourceColumn: customer_unique_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column recency
+		dataType: int64
+		formatString: 0
+		lineageTag: a80c3f95-e8fa-4d3a-8d04-338cc2364128
+		summarizeBy: none
+		sourceColumn: recency
+
+		annotation SummarizationSetBy = Automatic
+
+	column frequency
+		dataType: int64
+		formatString: 0
+		lineageTag: 50170820-2f64-4237-a3e8-b0e36eab62b8
+		summarizeBy: none
+		sourceColumn: frequency
+
+		annotation SummarizationSetBy = Automatic
+
+	column monetary
+		dataType: double
+		lineageTag: a1f2efac-8f0d-4318-a7c9-780f5df7e9c7
+		summarizeBy: none
+		sourceColumn: monetary
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column segment
+		dataType: string
+		lineageTag: a65d9d42-459b-4795-99f8-fe4aaeec4bd0
+		summarizeBy: none
+		sourceColumn: segment
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Revenue Rank' = RANKX('rfm_segments', 'rfm_segments'[monetary], , DESC)
+		formatString: 0
+		lineageTag: 537aafc8-fc90-4441-9d0b-023cfdf6dbd2
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Cumulative %' = VAR TotalCustomers = COUNTROWS('rfm_segments') VAR TotalRevenue = SUM('rfm_segments'[monetary]) VAR CumRevenue = CALCULATE(SUM('rfm_segments'[monetary]), FILTER('rfm_segments', 'rfm_segments'[Revenue Rank] <= EARLIER('rfm_segments'[Revenue Rank]))) RETURN DIVIDE(CumRevenue, TotalRevenue) * 100
+		lineageTag: 451995c1-caf2-43c2-a419-22dc83055df4
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Customer Percentile' = DIVIDE('rfm_segments'[Revenue Rank], COUNTROWS('rfm_segments')) * 100
+		lineageTag: 7ccb1211-02ae-4fe1-9170-2dd4a1b24652
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition rfm_segments = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents("E:\ecommerce-sales-analysis\data\rfm_segments.csv"),[Delimiter=",", Columns=5, Encoding=1252, QuoteStyle=QuoteStyle.None]),
+				    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"customer_unique_id", type text}, {"recency", Int64.Type}, {"frequency", Int64.Type}, {"monetary", type number}, {"segment", type text}})
+				in
+				    #"Changed Type"
+
+	annotation PBI_ResultType = Table
+

@@ -1,0 +1,71 @@
+table 'public order_reviews'
+	lineageTag: 1bbb5946-a8d5-4674-803a-23f42ed830c5
+
+	column review_id
+		dataType: string
+		lineageTag: ea12449c-040f-49b2-825e-a53e707c97c7
+		summarizeBy: none
+		sourceColumn: review_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column order_id
+		dataType: string
+		lineageTag: e25596df-59db-4fc0-981c-4984c9429fbd
+		summarizeBy: none
+		sourceColumn: order_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column review_score
+		dataType: int64
+		formatString: 0
+		lineageTag: 08698054-bcb3-4849-9fee-60d10915e0c7
+		summarizeBy: sum
+		sourceColumn: review_score
+
+		annotation SummarizationSetBy = Automatic
+
+	column review_comment_title
+		dataType: string
+		lineageTag: 34836dd3-efe2-44c8-82c4-c60980c30e75
+		summarizeBy: none
+		sourceColumn: review_comment_title
+
+		annotation SummarizationSetBy = Automatic
+
+	column review_comment_message
+		dataType: string
+		lineageTag: 4734bffe-f7af-4369-af37-2efb4dd8d420
+		summarizeBy: none
+		sourceColumn: review_comment_message
+
+		annotation SummarizationSetBy = Automatic
+
+	column review_creation_date
+		dataType: string
+		lineageTag: 1186d669-279a-4d53-833b-1987e3dc3c61
+		summarizeBy: none
+		sourceColumn: review_creation_date
+
+		annotation SummarizationSetBy = Automatic
+
+	column review_answer_timestamp
+		dataType: string
+		lineageTag: bdcca90d-5083-4de4-bec7-1968a31ef16b
+		summarizeBy: none
+		sourceColumn: review_answer_timestamp
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'public order_reviews' = m
+		mode: import
+		source =
+				let
+				    Source = PostgreSQL.Database("localhost:5432", "ecommerce_db"),
+				    public_order_reviews = Source{[Schema="public",Item="order_reviews"]}[Data]
+				in
+				    public_order_reviews
+
+	annotation PBI_ResultType = Table
+
